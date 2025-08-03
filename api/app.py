@@ -5,7 +5,6 @@ import pytesseract
 from pdf2image import convert_from_bytes
 import io
 import os
-from tempfile import NamedTemporaryFile
 
 app = FastAPI()
 
