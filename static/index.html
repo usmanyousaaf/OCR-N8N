@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF OCR</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-4">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+        <h1 class="text-2xl font-bold mb-4">PDF Text Extractor</h1>
+        <input type="file" id="pdfFile" accept=".pdf" class="mb-4">
+        <button onclick="extractText()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Extract Text</button>
+        <div id="result" class="mt-4 p-4 bg-gray-50 rounded max-h-96 overflow-auto"></div>
+    </div>
+
+    <script>
+        async function extractText() {
+            const fileInput = document.getElementById('pdfFile');
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Processing...';
+
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<p class="text-red-500">Please select a PDF file.</p>';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('/ocr', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    let output = `<p><strong>File:</strong> ${data.filename}</p>`;
+                    data.pages.forEach(page => {
+                        output += `<p><strong>Page ${page.page}:</strong></p><pre class="text-sm">${page.text}</pre>`;
+                    });
+                    resultDiv.innerHTML = output;
+                } else {
+                    resultDiv.innerHTML = `<p class="text-red-500">Error: ${data.detail}</p>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "framework": null,
+  "installCommand": "pip install -r requirements.txt",
+  "buildCommand": "echo 'No build required'",
+  "outputDirectory": ".",
+  "devCommand": "uvicorn app:app --host 0.0.0.0 --port $PORT",
+  "functions": {
+    "app.py": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "routes": [
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/app.py" }
+  ]
+}
